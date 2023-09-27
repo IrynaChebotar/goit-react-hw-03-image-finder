@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const GalleryItem = styled.li`
+  margin: 10px;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);

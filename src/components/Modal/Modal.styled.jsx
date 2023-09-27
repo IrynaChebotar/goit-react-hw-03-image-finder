@@ -13,6 +13,9 @@ export const Overlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #fff;
   padding: 20px;
   border-radius: 4px;
@@ -20,4 +23,9 @@ export const ModalContainer = styled.div`
   max-width: 90%;
   max-height: 90%;
   overflow: auto;
+
+  img {
+    max-width: 80%;
+    overflow: hidden;
+  }
 `;
