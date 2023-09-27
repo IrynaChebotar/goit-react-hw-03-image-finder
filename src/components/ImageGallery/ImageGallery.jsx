@@ -1,9 +1,10 @@
 import React from 'react';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
+import { GalleryContainer } from './ImageGallery.styled';
 
 export const ImageGallery = ({ images, onItemClick }) => {
   return (
-    <ul className="gallery">
+    <GalleryContainer>
       {images.map(image => (
         <ImageGalleryItem
           key={image.id}
@@ -11,6 +12,6 @@ export const ImageGallery = ({ images, onItemClick }) => {
           onClick={() => onItemClick(image.largeImageURL)}
         />
       ))}
-    </ul>
+    </GalleryContainer>
   );
 };

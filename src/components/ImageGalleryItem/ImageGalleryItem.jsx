@@ -1,10 +1,11 @@
 // ImageGalleryItem.js
 import React from 'react';
+import { GalleryItem, GalleryItemimage } from './ImageGalleryItem.styled';
 
 export const ImageGalleryItem = ({ imageUrl, onClick }) => {
   return (
-    <li className="gallery-item">
-      <img src={imageUrl} alt="" onClick={onClick} />
-    </li>
+    <GalleryItem className="gallery-item">
+      <GalleryItemimage src={imageUrl} alt="" onClick={onClick} />
+    </GalleryItem>
   );
 };
