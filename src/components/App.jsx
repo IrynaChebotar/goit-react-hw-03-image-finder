@@ -4,45 +4,46 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
+import { fetchImages } from './Api';
 
 export class App extends Component {
   state = {
     images: [],
     query: '',
     page: 1,
-    showModal: false,
-    largeImageUrl: '',
     isLoading: false,
   };
 
-  handleSubmit = query => {
-    this.setState({ query, images: [], page: 1 }, this.fetchImages);
+  handleSubmit = async newQuery => {
+    this.setState({ query: newQuery, images: [], page: 1 });
+
+    try {
+      const newImages = await fetchImages(newQuery, 1);
+      this.setState({ images: newImages });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
-  fetchImages = () => {
+  handleLoadMore = async () => {
     const { query, page } = this.state;
-    const apiKey = '38660146-342c23407320306ce6d6468a8';
+    const nextPage = page + 1;
 
     this.setState({ isLoading: true });
 
-    fetch(
-      `https://pixabay.com/api/?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then(response => response.json())
-      .then(data => {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...data.hits],
-          page: prevState.page + 1,
-        }));
-      })
-      .catch(error => console.error('Error fetching images:', error))
-      .finally(() => {
-        this.setState({ isLoading: false });
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      });
+    try {
+      const newImages = await fetchImages(query, nextPage);
+      this.setState(prevState => ({
+        images: [...prevState.images, ...newImages],
+        page: nextPage,
+      }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.setState({ isLoading: false });
+    }
   };
 
   handleImageClick = largeImageUrl => {
@@ -62,7 +63,7 @@ export class App extends Component {
         <ImageGallery images={images} onItemClick={this.handleImageClick} />
         {isLoading && <Loader />}
         {images.length > 0 && !isLoading && (
-          <Button onClick={this.fetchImages} />
+          <Button onClick={this.handleLoadMore} />
         )}
         {showModal && (
           <Modal
