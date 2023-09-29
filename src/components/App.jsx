@@ -12,38 +12,34 @@ export class App extends Component {
     query: '',
     page: 1,
     isLoading: false,
+    totalImages: 0,
+  };
+
+  componentDidUpdate = async (_, prevState) => {
+    const { page, query } = this.state;
+    if (page !== prevState || query !== prevState.query) {
+      this.setState({ isLoading: true });
+      try {
+        const data = await fetchImages(query, page);
+        if (!data.length) return;
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          totalImages: data.totalHits,
+        }));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    }
   };
 
   handleSubmit = async newQuery => {
-    this.setState({ query: newQuery, images: [], page: 1 });
-
-    try {
-      const newImages = await fetchImages(newQuery, 1);
-      this.setState({ images: newImages });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.setState({ loading: false });
-    }
+    this.setState({ query: newQuery, images: [], page: 1, totalImages: 0 });
   };
 
   handleLoadMore = async () => {
-    const { query, page } = this.state;
-    const nextPage = page + 1;
-
-    this.setState({ isLoading: true });
-
-    try {
-      const newImages = await fetchImages(query, nextPage);
-      this.setState(prevState => ({
-        images: [...prevState.images, ...newImages],
-        page: nextPage,
-      }));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.setState({ isLoading: false });
-    }
+    this.setState(prev => ({ page: prev.page + 1 }));
   };
 
   handleImageClick = largeImageUrl => {
@@ -55,14 +51,15 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading, showModal, largeImageUrl } = this.state;
+    const { images, isLoading, showModal, largeImageUrl, totalImages } =
+      this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleSubmit} />
         <ImageGallery images={images} onItemClick={this.handleImageClick} />
         {isLoading && <Loader />}
-        {images.length > 0 && !isLoading && (
+        {images.length !== totalImages && !isLoading && (
           <Button onClick={this.handleLoadMore} />
         )}
         {showModal && (
