@@ -17,11 +17,11 @@ export class App extends Component {
 
   componentDidUpdate = async (_, prevState) => {
     const { page, query } = this.state;
-    if (page !== prevState || query !== prevState.query) {
+    if (page !== prevState.page || query !== prevState.query) {
       this.setState({ isLoading: true });
       try {
         const data = await fetchImages(query, page);
-        if (!data.length) return;
+        if (!data.hits.length) return;
         this.setState(prevState => ({
           images: [...prevState.images, ...data.hits],
           totalImages: data.totalHits,
